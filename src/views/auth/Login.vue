@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,9 +8,10 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { LoaderCircle } from 'lucide-vue-next';
 import { reactive } from 'vue';
 import { useAuth } from '@/composables/useAuth';
+import { useRouter } from 'vue-router';
 
 const { login, loading, error } = useAuth();
-
+const router = useRouter();
 // defineProps<{
 //     status?: string;
 //     canResetPassword: boolean;
@@ -31,7 +31,7 @@ const submit = async () => {
             remember: form.remember,
         });
 
-
+        router.push('/dashboard');
     } catch (err) {
         console.error('Login error:', err);
     }
