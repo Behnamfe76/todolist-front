@@ -67,14 +67,16 @@ export function useAuth() {
 
     const logout = async () => {
         try {
+            const token = getToken()
+            if (!token) return false
+
             loading.value = true
             error.value = null
-
             await axios.post('/logout')
             removeToken()
             user.value = null
 
-            router.push('/login')
+            window.location.href = '/'
         } catch (err: any) {
             error.value = err.response?.data?.message || 'An error occurred during logout'
             throw err
@@ -89,6 +91,7 @@ export function useAuth() {
             if (!token) return false
 
             const response = await axios.get('/user')
+
             user.value = response.data
             return true
         } catch (err) {
