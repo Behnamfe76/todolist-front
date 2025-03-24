@@ -25,12 +25,30 @@ const router = createRouter({
             component: Register,
             meta: { requiresAuth: false },
         },
-        // {
-        //     path: '/dashboard',
-        //     name: 'dashboard',
-        //     component: () => import('../views/DashboardView.vue'),
-        //     meta: { requiresAuth: true },
-        // },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: () => import('../views/DashboardView.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/settings/profile',
+            name: 'profile.edit',
+            component: () => import('../views/settings/Profile.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/settings/password',
+            name: 'password.edit',
+            component: () => import('../views/settings/Password.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/settings/appearance',
+            name: 'appearance',
+            component: () => import('../views/settings/Appearance.vue'),
+            meta: { requiresAuth: true },
+        },
     ],
 })
 
