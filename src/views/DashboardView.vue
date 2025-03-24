@@ -1,31 +1,38 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
-import auth from '@/lib/authentication';
-import { useRouter } from 'vue-router';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
+import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 
-const router = useRouter();
-
-const handleLogout = async () => {
-    try {
-        await auth.logout();
-        router.push('/login');
-    } catch (error) {
-        console.error('Logout failed:', error);
-    }
-};
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+];
 </script>
 
 <template>
-    <div class="container mx-auto p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Dashboard</h1>
-            <Button @click="handleLogout" variant="outline">Logout</Button>
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
+                <div
+                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <PlaceholderPattern />
+                </div>
+                <div
+                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <PlaceholderPattern />
+                </div>
+                <div
+                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <PlaceholderPattern />
+                </div>
+            </div>
+            <div
+                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
+                <PlaceholderPattern />
+            </div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 class="text-xl font-semibold mb-4">Welcome to your dashboard!</h2>
-            <p class="text-gray-600 dark:text-gray-300">
-                You are now logged in. This is a protected route that only authenticated users can access.
-            </p>
-        </div>
-    </div>
-</template> 
+    </AppLayout>
+</template>
