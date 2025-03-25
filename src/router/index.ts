@@ -33,19 +33,19 @@ const router = createRouter({
         },
         {
             path: '/settings/profile',
-            name: 'profile.edit',
+            name: 'settings.profile',
             component: () => import('../views/settings/Profile.vue'),
             meta: { requiresAuth: true },
         },
         {
             path: '/settings/password',
-            name: 'password.edit',
+            name: 'settings.password',
             component: () => import('../views/settings/Password.vue'),
             meta: { requiresAuth: true },
         },
         {
             path: '/settings/appearance',
-            name: 'appearance',
+            name: 'settings.appearance',
             component: () => import('../views/settings/Appearance.vue'),
             meta: { requiresAuth: true },
         },
