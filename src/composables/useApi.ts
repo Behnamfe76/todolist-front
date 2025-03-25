@@ -62,7 +62,7 @@ export function useApi<T = any>() {
             return { data: response.data as T, error: null, loading: false }
         } catch (err: any) {
             success.value = false
-            error.value = err.response?.data?.message || 'An error occurred'
+            error.value = err.response?.data || 'An error occurred'
             return { data: null, error: error.value, loading: false }
         } finally {
             loading.value = false
