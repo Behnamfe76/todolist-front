@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 const { user } = useAuth();
-const { postRequest, loading, success } = useApi();
+const { patchRequest, loading, success } = useApi();
 const userData = user.value as User;
 
 const form = reactive({
@@ -30,7 +30,7 @@ const form = reactive({
 });
 
 const submit = () => {
-    postRequest('/profile/edit', {
+    patchRequest('/settings/profile', {
         name: form.name,
         email: form.email,
     }, {
