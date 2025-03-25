@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import NarrowWithBadges from '@/components/Lists/NarrowWithBadges.vue';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Tasks',
+        href: '/tasks',
     },
 ];
 </script>
@@ -15,7 +17,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl py-4 px-8">
-            <narrow-with-badges />
+            <div>
+                <Button @click="router.push('/tasks/create')" class="mt-4" :tabindex="4" :disabled="loading">
+                    Create
+                </Button>
+            </div>
         </div>
     </AppLayout>
 </template>
