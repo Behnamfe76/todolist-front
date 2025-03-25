@@ -12,7 +12,6 @@ import { toTypedSchema } from '@vee-validate/yup';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
 import { useApi } from '@/composables/useApi';
-import { watch } from 'vue';
 
 
 // Define the validation schema
