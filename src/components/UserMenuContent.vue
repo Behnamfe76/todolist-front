@@ -22,7 +22,7 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <RouterLink class="block w-full" to="profile/edit" as="button">
+            <RouterLink class="block w-full" to="settings/profile" as="button">
                 <Settings class="mr-2 h-4 w-4" />
                 Settings
             </RouterLink>
