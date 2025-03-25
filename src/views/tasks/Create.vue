@@ -4,6 +4,7 @@ import { type BreadcrumbItem } from '@/types';
 import { LoaderCircle } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Datepicker } from '@/components/ui/Datepicker';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
@@ -13,12 +14,12 @@ import { reactive } from 'vue';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 import * as yup from 'yup';
-import { watch } from 'vue';
-
+import moment from 'moment';
 // Define the validation schema
 const schema = toTypedSchema(
     yup.object({
         title: yup.string().required('Title is required'),
+        date: yup.date().required('Date is required'),
         description: yup.string().nullable(),
         type: yup.object().required('Type is required'),
         status: yup.object().required('Status is required'),
@@ -32,6 +33,7 @@ const { errors, handleSubmit, defineField } = useForm({
     initialValues: {
         title: '',
         description: '',
+        date: new Date(),
         type: { label: 'Internal', value: 'internal' },
         status: { label: 'Todo', value: 'todo' },
         priority: { label: 'Medium', value: 'medium' },
@@ -44,6 +46,7 @@ const [description, descriptionAttrs] = defineField('description');
 const [type] = defineField('type');
 const [status] = defineField('status');
 const [priority] = defineField('priority');
+const [date, dateAttrs] = defineField('date');
 
 const taskTypes = reactive([
     { label: 'Internal', value: 'internal' },
@@ -83,11 +86,13 @@ const submit = handleSubmit(async (values) => {
         const payload = {
             title: values.title,
             description: values.description,
+            // date: moment(date.value).format('YYYY-MM-DD HH:mm:ss'),
             type: values.type.value,
             status: values.status.value,
             priority: values.priority.value,
         };
-
+        console.log(payload)
+        return;
         await postRequest('/tasks', payload, { withAuth: true });
 
         if (success.value) {
@@ -112,12 +117,21 @@ const submit = handleSubmit(async (values) => {
                         </p>
 
                         <div class="mt-10 space-y-4 pb-12 sm:pb-0">
-                            <div class="grid gap-2">
-                                <Label for="title">Title</Label>
-                                <Input id="title" v-model="title" v-bind="titleAttrs" placeholder="title" />
-                                <span v-if="errors.title" class="text-red-500 text-sm">
-                                    {{ errors.title }}
-                                </span>
+                            <div class="grid gap-2 grid-cols-2 items-start">
+                                <div class="grid gap-2">
+                                    <Label for="title">Title</Label>
+                                    <Input id="title" v-model="title" v-bind="titleAttrs" placeholder="title" />
+                                    <span v-if="errors.title" class="text-red-500 text-sm">
+                                        {{ errors.title }}
+                                    </span>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label for="date">Date</Label>
+                                    <Datepicker id="date" v-model="date" v-bind="dateAttrs" />
+                                    <span v-if="errors.date" class="text-red-500 text-sm">
+                                        {{ errors.date }}
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="grid gap-2">
