@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { useApi } from '@/composables/useApi';
+import InputError from '@/components/InputError.vue';
 import { useRouter } from 'vue-router';
 import { reactive } from 'vue';
 import { useForm } from 'vee-validate';
@@ -71,7 +72,7 @@ const selectOptions = reactive({
     priority: taskPriorities[1],
 });
 
-const { loading, postRequest, errors: apiErrors, success } = useApi();
+const { loading, postRequest, error: apiErrors, success } = useApi();
 const router = useRouter();
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -86,13 +87,11 @@ const submit = handleSubmit(async (values) => {
         const payload = {
             title: values.title,
             description: values.description,
-            // date: moment(date.value).format('YYYY-MM-DD HH:mm:ss'),
+            date: moment(date.value).format('YYYY-MM-DD HH:mm:ss'),
             type: values.type.value,
             status: values.status.value,
             priority: values.priority.value,
         };
-        console.log(payload)
-        return;
         await postRequest('/tasks', payload, { withAuth: true });
 
         if (success.value) {
@@ -121,16 +120,13 @@ const submit = handleSubmit(async (values) => {
                                 <div class="grid gap-2">
                                     <Label for="title">Title</Label>
                                     <Input id="title" v-model="title" v-bind="titleAttrs" placeholder="title" />
-                                    <span v-if="errors.title" class="text-red-500 text-sm">
-                                        {{ errors.title }}
-                                    </span>
+                                    <InputError :message="apiErrors?.errors?.title?.join('') ?? errors.title" />
                                 </div>
                                 <div class="grid gap-2">
                                     <Label for="date">Date</Label>
                                     <Datepicker id="date" v-model="date" v-bind="dateAttrs" />
-                                    <span v-if="errors.date" class="text-red-500 text-sm">
-                                        {{ errors.date }}
-                                    </span>
+                                    <InputError :message="apiErrors?.errors?.date?.join('') ?? errors.date" />
+
                                 </div>
                             </div>
 
@@ -138,9 +134,8 @@ const submit = handleSubmit(async (values) => {
                                 <Label for="description">Description</Label>
                                 <Textarea id="description" v-model="description" v-bind="descriptionAttrs"
                                     placeholder="description" />
-                                <span v-if="errors.description" class="text-red-500 text-sm">
-                                    {{ errors.description }}
-                                </span>
+                                <InputError :message="apiErrors?.errors?.description?.join('') ?? errors.description" />
+
                             </div>
 
                             <div class="grid gap-2 grid-cols-3">
@@ -148,27 +143,23 @@ const submit = handleSubmit(async (values) => {
                                     <Label for="types">Type</Label>
                                     <Select @update:modelValue="(e) => type = e" :options="taskTypes"
                                         v-model="selectOptions.type" placeholder="select a type..." />
-                                    <span v-if="errors.type" class="text-red-500 text-sm">
-                                        {{ errors.type }}
-                                    </span>
+                                    <InputError :message="apiErrors?.errors?.type?.join('') ?? errors.type" />
+
                                 </div>
 
                                 <div class="grid gap-2">
                                     <Label for="statuses">Status</Label>
                                     <Select @update:modelValue="(e) => status = e" :options="taskStatuses"
                                         v-model="selectOptions.status" placeholder="select a status..." />
-                                    <span v-if="errors.status" class="text-red-500 text-sm">
-                                        {{ errors.status }}
-                                    </span>
+                                    <InputError :message="apiErrors?.errors?.status?.join('') ?? errors.status" />
                                 </div>
 
                                 <div class="grid gap-2">
                                     <Label for="priorities">Priority</Label>
                                     <Select @update:modelValue="(e) => priority = e" :options="taskPriorities"
                                         v-model="selectOptions.priority" placeholder="select a priority..." />
-                                    <span v-if="errors.priority" class="text-red-500 text-sm">
-                                        {{ errors.priority }}
-                                    </span>
+                                    <InputError :message="apiErrors?.errors?.priority?.join('') ?? errors.priority" />
+
                                 </div>
                             </div>
                         </div>
