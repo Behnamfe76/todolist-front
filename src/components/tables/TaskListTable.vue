@@ -170,7 +170,7 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                                     {{ moment(item[thead.name]).calendar() }}
                                                 </div>
 
-                                                <!-- showing the tasks's due_date -->
+                                                <!-- showing the tasks's progress -->
                                                 <div class="flex gap-2 w-full items-center"
                                                     v-else-if="thead.name == 'progress'">
                                                     <div class="text-xs">{{ item[thead.name] }}%</div>
