@@ -22,13 +22,21 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/tasks/show',
     },
 ];
-const toggleState = ref(false)
+const toggleStates = reactive({
+    type: false,
+    status: false,
+})
 const uuid = route.params.uuid;
 const taskTypes = reactive([
     { label: 'Internal', value: 'internal' },
     { label: 'External', value: 'external' },
 ]);
-
+const taskStatuses = reactive([
+    { label: 'Todo', value: 'todo' },
+    { label: 'On Progress', value: 'on_progress' },
+    { label: 'Done', value: 'done' },
+    { label: 'Expired', value: 'expired' },
+]);
 
 const initializePageData = async () => {
     try {
@@ -41,6 +49,13 @@ const initializePageData = async () => {
 const handleTaskType = async (type: string) => {
     try {
         await patchRequest(`/tasks/${uuid}/update-type`, { type }, { withAuth: true });
+    } catch (err) {
+        console.log('failed to fetch task data: ' + err)
+    }
+}
+const handleTaskStatus = async (status: string) => {
+    try {
+        await patchRequest(`/tasks/${uuid}/update-status`, { status }, { withAuth: true });
     } catch (err) {
         console.log('failed to fetch task data: ' + err)
     }
@@ -69,8 +84,10 @@ onBeforeMount(async () => {
                     </div>
 
                     <div class="flex divide-x-2 divide-gray-400 rounded">
+
+                        <!-- task type -->
                         <span class="pe-6 flex flex-col gap-3">
-                            <DropdownMenuRoot v-model:open="toggleState">
+                            <DropdownMenuRoot v-model:open="toggleStates.type">
                                 <DropdownMenuTrigger class="flex items-center gap-2">
                                     <span>Type</span>
                                     <Icon icon="radix-icons:chevron-down" />
@@ -95,12 +112,41 @@ onBeforeMount(async () => {
                             </DropdownMenuRoot>
                             <span
                                 class="bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
-                                {{ data.data.type }}
+                                {{taskTypes.filter((t) => t.value === data.data.type)[0].label}}
                             </span>
                         </span>
-                        <span class="px-6">
-                            {{ data.data.status }}
+
+                        <!-- task status -->
+                        <span class="px-6 flex flex-col gap-3">
+                            <DropdownMenuRoot v-model:open="toggleStates.status">
+                                <DropdownMenuTrigger class="flex items-center gap-2">
+                                    <span>Status</span>
+                                    <Icon icon="radix-icons:chevron-down" />
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuPortal>
+                                    <DropdownMenuContent
+                                        class="min-w-[220px] outline-none bg-white rounded-md p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade"
+                                        :side-offset="5">
+
+                                        <DropdownMenuItem v-for="status in taskStatuses" :key="status.label"
+                                            :value="status.label"
+                                            class="group text-[13px] leading-none text-grass11 rounded-[3px] flex items-center justify-between h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-green9 data-[highlighted]:text-green1 hover:text-white hover:bg-black"
+                                            @click="handleTaskStatus(status.value)">
+                                            <span>
+                                                {{ status.label }}
+                                            </span>
+                                            <Icon v-if="status.value == data.data.status" icon="radix-icons:check" />
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenuPortal>
+                            </DropdownMenuRoot>
+                            <span
+                                class="flex justify-center bg-purple-100  text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
+                                {{taskStatuses.filter((s) => s.value === data.data.status)[0].label}}
+                            </span>
                         </span>
+
                         <span class="px-6">
                             {{ data.data.priority }}
                         </span>
