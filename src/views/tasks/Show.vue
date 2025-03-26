@@ -25,6 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const toggleStates = reactive({
     type: false,
     status: false,
+    priority: false,
 })
 const uuid = route.params.uuid;
 const taskTypes = reactive([
@@ -36,6 +37,12 @@ const taskStatuses = reactive([
     { label: 'On Progress', value: 'on_progress' },
     { label: 'Done', value: 'done' },
     { label: 'Expired', value: 'expired' },
+]);
+const taskPriorities = reactive([
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' },
+    { label: 'Urgent', value: 'urgent' },
 ]);
 
 const initializePageData = async () => {
@@ -56,6 +63,13 @@ const handleTaskType = async (type: string) => {
 const handleTaskStatus = async (status: string) => {
     try {
         await patchRequest(`/tasks/${uuid}/update-status`, { status }, { withAuth: true });
+    } catch (err) {
+        console.log('failed to fetch task data: ' + err)
+    }
+}
+const handleTaskPriority = async (priority: string) => {
+    try {
+        await patchRequest(`/tasks/${uuid}/update-priority`, { priority }, { withAuth: true });
     } catch (err) {
         console.log('failed to fetch task data: ' + err)
     }
@@ -147,9 +161,38 @@ onBeforeMount(async () => {
                             </span>
                         </span>
 
-                        <span class="px-6">
-                            {{ data.data.priority }}
+                        <!-- task priority -->
+                        <span class="px-6 flex flex-col gap-3">
+                            <DropdownMenuRoot v-model:open="toggleStates.priority">
+                                <DropdownMenuTrigger class="flex items-center gap-2">
+                                    <span>Priority</span>
+                                    <Icon icon="radix-icons:chevron-down" />
+                                </DropdownMenuTrigger>
+
+                                <DropdownMenuPortal>
+                                    <DropdownMenuContent
+                                        class="min-w-[220px] outline-none bg-white rounded-md p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade"
+                                        :side-offset="5">
+
+                                        <DropdownMenuItem v-for="priority in taskPriorities" :key="priority.label"
+                                            :value="priority.label"
+                                            class="group text-[13px] leading-none text-grass11 rounded-[3px] flex items-center justify-between h-[25px] px-[5px] relative pl-[25px] select-none outline-none data-[disabled]:text-mauve8 data-[disabled]:pointer-events-none data-[highlighted]:bg-green9 data-[highlighted]:text-green1 hover:text-white hover:bg-black"
+                                            @click="handleTaskPriority(priority.value)">
+                                            <span>
+                                                {{ priority.label }}
+                                            </span>
+                                            <Icon v-if="priority.value == data.data.priority"
+                                                icon="radix-icons:check" />
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenuPortal>
+                            </DropdownMenuRoot>
+                            <span
+                                class="flex justify-center bg-purple-100  text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
+                                {{taskPriorities.filter((p) => p.value === data.data.priority)[0].label}}
+                            </span>
                         </span>
+
                     </div>
                 </div>
 
