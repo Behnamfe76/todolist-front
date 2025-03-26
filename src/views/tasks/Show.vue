@@ -2,9 +2,12 @@
 import { useApi } from '@/composables/useApi';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { onBeforeMount, reactive, ref } from 'vue';
+import { onBeforeMount, reactive } from 'vue';
 import { Icon } from '@iconify/vue'
+import { CircleCheck, CircleX } from "lucide-vue-next"
 import { useRoute } from 'vue-router';
+import moment from 'moment';
+import { statusClassAttributes, priorityClassAttributes } from '@/helpers/helper';
 import {
     DropdownMenuContent,
     DropdownMenuItem,
@@ -15,7 +18,7 @@ import {
 
 
 const { getRequest, patchRequest, loading, error, data } = useApi();
-const route = useRoute()
+const route = useRoute();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Show',
@@ -44,6 +47,7 @@ const taskPriorities = reactive([
     { label: 'High', value: 'high' },
     { label: 'Urgent', value: 'urgent' },
 ]);
+
 
 const initializePageData = async () => {
     try {
@@ -155,8 +159,8 @@ onBeforeMount(async () => {
                                     </DropdownMenuContent>
                                 </DropdownMenuPortal>
                             </DropdownMenuRoot>
-                            <span
-                                class="flex justify-center bg-purple-100  text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
+                            <span :class="[statusClassAttributes[data.data.status]]"
+                                class="flex justify-center text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">
                                 {{taskStatuses.filter((s) => s.value === data.data.status)[0].label}}
                             </span>
                         </span>
@@ -187,15 +191,39 @@ onBeforeMount(async () => {
                                     </DropdownMenuContent>
                                 </DropdownMenuPortal>
                             </DropdownMenuRoot>
-                            <span
-                                class="flex justify-center bg-purple-100  text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
+                            <span :class="[priorityClassAttributes[data.data.priority]]"
+                                class="flex justify-center text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">
                                 {{taskPriorities.filter((p) => p.value === data.data.priority)[0].label}}
                             </span>
                         </span>
 
+                        <!-- task situation ==> close or open -->
+                        <span class="px-6 flex flex-col gap-3">
+                            <span>Completed</span>
+                            <span class="flex justify-center">
+                                <CircleCheck class="h-4 w-4 text-teal-500" v-if="data.data.is_completed" />
+                                <CircleX class="h-4 w-4 text-rose-500" v-else />
+                            </span>
+                        </span>
+
+                        <!-- showing the tasks's due_date -->
+                        <span class="px-6 flex flex-col gap-3">
+                            <span>Due Date</span>
+                            <span class="flex justify-center">
+                                {{ moment(data.data.due_date).calendar() }}
+                            </span>
+                        </span>
+
+                        <!-- showing the tasks's done date -->
+                        <span v-if="data.data.status === 'done' || data.data.status === 'expired'"
+                            class="px-6 flex flex-col gap-3">
+                            <span>Done Date</span>
+                            <span class="flex justify-center">
+                                {{ moment(data.data.done_date).calendar() }}
+                            </span>
+                        </span>
                     </div>
                 </div>
-
 
                 <div>
                     sub tasks
