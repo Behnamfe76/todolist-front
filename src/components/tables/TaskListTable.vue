@@ -190,8 +190,10 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                             </div>
 
                                             <!-- external link to the first task -->
-                                            <ExternalLink class="h-4 w-4 text-gray-500 cursor-pointer"
-                                                v-if="index == 0" />
+                                            <RouterLink :to="`/tasks/${item.uuid}`">
+                                                <ExternalLink class="h-4 w-4 text-gray-500 cursor-pointer"
+                                                    v-if="index == 0" />
+                                            </RouterLink>
                                         </div>
                                     </td>
                                 </tr>
