@@ -1,13 +1,10 @@
 <script setup>
-import { Button } from '@/components/ui/button';
 import moment from 'moment';
 import { ExternalLink, CircleCheck, CircleX } from "lucide-vue-next"
 import { ref, computed, onBeforeMount, reactive } from 'vue'
-import { useRouter } from 'vue-router';
 const props = defineProps({
     data: { required: true, type: Object }
 });
-const router = useRouter();
 
 const tableHead = [
     {
@@ -74,18 +71,8 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
 
 <template>
     <div class="px-4 sm:px-6 lg:px-8">
-        <div class="sm:flex sm:items-center">
-            <div class="sm:flex-auto">
-                <h1 class="text-base font-semibold text-gray-900">Tasks</h1>
-                <p class="mt-2 text-sm text-gray-700">A list of all the tasks in your account.</p>
-            </div>
-            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                <Button @click="router.push('/tasks/create')" class="mt-4" :tabindex="4">
-                    Create
-                </Button>
-            </div>
-        </div>
-        <div class="mt-8 flow-root">
+
+        <div class="flow-root">
             <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                     <div class="relative">
@@ -122,10 +109,8 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                     <th v-for="item in tableHead" :key="item" scope="col"
                                         class="min-w-[5rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
                                         :class="[
-                                            item.name === 'progress' && 'min-w-[10rem]',
-                                        ]"
-
-                                        >
+                                            item.name === 'progress' && 'min-w-[10.5rem]',
+                                        ]">
                                         {{ item.label }}
                                     </th>
 
@@ -178,7 +163,7 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                                 <!-- showing the tasks's progress -->
                                                 <div class="flex gap-2 w-full items-center"
                                                     v-else-if="thead.name == 'progress'">
-                                                    <div class="text-xs">{{ item[thead.name] }}%</div>
+                                                    <div class="text-xs w-[15%]">{{ item[thead.name] }}%</div>
                                                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                                                         <div class="bg-blue-600 h-2.5 rounded-full"
                                                             :style="{ width: `${item[thead.name]}%` }">
@@ -187,14 +172,11 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                                 </div>
 
                                                 <!-- giving a badge style to statuses -->
-                                                <div v-else
-                                                    :class="[
-                                                        thead.name == 'status' ? statuses[item.status.name] + ' px-2 py-[1px] rounded ' : '',
-                                                        thead.name == 'description' ? ' w-[10rem] truncate ' : '',
-                                                        thead.name == 'title' ? ' w-[15rem] truncate ' : '',
-                                                    ]"
-
-                                                    >
+                                                <div v-else :class="[
+                                                    thead.name == 'status' ? statuses[item.status.name] + ' px-2 py-[1px] rounded ' : '',
+                                                    thead.name == 'description' ? ' w-[10rem] truncate ' : '',
+                                                    thead.name == 'title' ? ' w-[15rem] truncate ' : '',
+                                                ]">
                                                     {{ item[thead.name]?.label ?? item[thead.name] }}
                                                 </div>
 
