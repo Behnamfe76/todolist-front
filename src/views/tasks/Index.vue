@@ -2,18 +2,18 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import TaskListTable from "@/components/tables/TaskListTable.vue"
-import { onBeforeMount, ref, watch } from 'vue';
+import { onBeforeMount, reactive, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useApi } from '@/composables/useApi';
 import Pagination from '@/components/Pagination.vue';
+import { Select } from '@/components/ui/select';
 import { LoaderCircle } from 'lucide-vue-next';
 import { useRoute, useRouter } from 'vue-router';
 import debounce from 'debounce';
 const route = useRoute();
 const router = useRouter();
-const taskSearchInput = ref();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Tasks',
@@ -22,27 +22,51 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 const taskSearch = ref();
 const { getRequest, loading, error, data } = useApi();
+const taskStatuses = reactive([
+    { label: 'All', value: 'all' },
+    { label: 'Todo', value: 'todo' },
+    { label: 'On Progress', value: 'on_progress' },
+    { label: 'Done', value: 'done' },
+    { label: 'Expired', value: 'expired' },
+]);
 
-const initTaskList = async (query: string = '') => {
+const taskIsCompleted = reactive([
+    { label: 'All', value: 'all' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Not Completed', value: 'not_completed' },
+]);
+const selectOptions = reactive({
+    status: taskStatuses[0],
+    completed: taskIsCompleted[0],
+});
+const initTaskList = async (query: string = '', status: string = 'all', completed: string = 'all') => {
     try {
-        await getRequest(`/tasks?page=${route.query.page ?? 1}&query=${query}`, { withAuth: true });
+        await getRequest(`/tasks?page=${route.query.page ?? 1}&query=${query}&status=${status}&completed=${completed}`, { withAuth: true });
+
+        if (query) {
+            document.getElementById('search-input')?.focus();
+        }
     } catch (err) {
         console.log("failed to relative tasks: " + err)
     }
 }
-
+const pushRouter = () => {
+    router.push(`/tasks?page=${route.query.page ?? 1}&query=${taskSearch.value}&status=${selectOptions.status.value}&completed=${selectOptions.completed.value}`);
+}
 onBeforeMount(async () => {
     await initTaskList();
 });
 
 watch(route, async () => {
-    await initTaskList();
+    await initTaskList(taskSearch.value, selectOptions.status.value, selectOptions.completed.value);
 })
 
-watch(taskSearch, debounce(async (value) => {
-    await initTaskList(value);
+watch(taskSearch, debounce(() => {
+    pushRouter()
+}, 1000));
 
-    document.getElementById('search-input')?.focus();
+watch(selectOptions, debounce(() => {
+    pushRouter()
 }, 1000));
 
 </script>
@@ -56,19 +80,26 @@ watch(taskSearch, debounce(async (value) => {
 
                 <!-- search/filter section -->
                 <div class="text-gray-900 dark:text-gray-100 mb-2 mx-8">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-end justify-between gap-4">
 
-                        <div class="flex flex-col gap-4 w-2/3">
-                            <Label for="search-input">search</Label>
-                            <Input ref="taskSearchInput" placeholder="looking for a task's title or description?"
-                                id="search-input" v-model="taskSearch" />
-                            <div class="flex gap-4 items-center">
-                                <span class="flex items-center gap-2" v-if="loading">
-                                    Loading ...
-                                    <LoaderCircle v-if="loading" class="h-4 w-4 animate-spin" />
+                        <div class="flex flex-col gap-4 w-full">
+                            <Label for="search-input">Search</Label>
+                            <Input ref="taskSearchInput" class="h-[36px]"
+                                placeholder="looking for a task's title or description?" id="search-input"
+                                v-model="taskSearch" />
 
-                                </span>
-                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-4 w-full">
+                            <Label for="statuses">Status</Label>
+                            <Select :options="taskStatuses" v-model="selectOptions.status"
+                                placeholder="select a type..." />
+                        </div>
+
+                        <div class="flex flex-col gap-4 w-full">
+                            <Label for="statuses">Completed</Label>
+                            <Select :options="taskIsCompleted" v-model="selectOptions.completed"
+                                placeholder="select a type..." />
                         </div>
 
 
