@@ -2,6 +2,7 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { ref, type Ref } from 'vue'
 import Cookies from 'js-cookie'
+import { useRouter, type Router } from 'vue-router'
 
 // Define generic response type
 interface ApiResponse<T> {
@@ -13,6 +14,7 @@ interface ApiResponse<T> {
 // Define config options with defaults
 interface ApiConfig extends AxiosRequestConfig {
     withAuth?: boolean // Whether to include Authorization header
+    redirectTo?: string // Whether to include Authorization header
 }
 
 // Create Axios instance with base configuration
@@ -30,6 +32,7 @@ export function useApi<T = any>() {
     const error: Ref<string | null> = ref(null)
     const data: Ref<T | null> = ref(null)
     const success: Ref<boolean> = ref(false)
+    const router: Router = useRouter()
 
     // Generic request handler
     const request = async (
@@ -59,6 +62,11 @@ export function useApi<T = any>() {
             })
             data.value = response.data
             success.value = true
+
+            if (config.redirectTo) {
+                router.push(config.redirectTo)
+            }
+
             return { data: response.data as T, error: null, loading: false }
         } catch (err: any) {
             success.value = false
