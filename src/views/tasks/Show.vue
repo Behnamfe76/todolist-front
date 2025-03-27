@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Datepicker } from '@/components/ui/Datepicker';
 import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import SubTasks from './SubTasks.vue';
 import { type BreadcrumbItem } from '@/types';
 import { inject, onBeforeMount, onUpdated, reactive, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue'
@@ -338,7 +339,7 @@ watch(editMode, (value) => {
                 </div>
 
                 <div>
-                    sub tasks
+                    <sub-tasks :uuid="data.data.uuid" />
                 </div>
             </div>
             <div v-else>loading...</div>
