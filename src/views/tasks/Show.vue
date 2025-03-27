@@ -8,10 +8,10 @@ import { Datepicker } from '@/components/ui/Datepicker';
 import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { onBeforeMount, reactive, ref, watch } from 'vue';
+import { inject, onBeforeMount, onUpdated, reactive, ref, watch } from 'vue';
 import { Icon } from '@iconify/vue'
-import { CircleCheck, CircleX, Pen, LoaderCircle } from "lucide-vue-next"
-import { useRoute } from 'vue-router';
+import { CircleCheck, CircleX, Pen, LoaderCircle, Trash } from "lucide-vue-next"
+import { useRoute, useRouter } from 'vue-router';
 import moment from 'moment';
 import { statusClassAttributes, priorityClassAttributes } from '@/helpers/helper';
 import {
@@ -25,10 +25,11 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 import * as yup from 'yup';
 
-
+const Swal = inject('$swal');
 const editMode = ref(false)
-const { getRequest, patchRequest, loading, error: apiErrors, data } = useApi();
+const { getRequest, patchRequest, deleteRequest, loading, error: apiErrors, data } = useApi();
 const route = useRoute();
+const router = useRouter();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Show',
@@ -105,6 +106,26 @@ const handleTaskPriority = async (priority: string) => {
         console.log('failed to fetch task data: ' + err)
     }
 }
+const deleteTask = async (uuid: string) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "The task would be deleted permanently. Do you want to?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then(async (result: { isConfirmed: boolean }) => {
+        if (result.isConfirmed) {
+            try {
+                deleteRequest(`/tasks/${uuid}`, { withAuth: true, redirectTo: '/tasks' });
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+    });
+}
 const submit = handleSubmit(async (values) => {
     try {
         const payload = {
@@ -125,6 +146,8 @@ onBeforeMount(async () => {
     await initializePageData();
 });
 
+
+
 watch(editMode, (value) => {
     if (value) {
         title.value = data.value?.data.title;
@@ -138,8 +161,7 @@ watch(editMode, (value) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl py-4 px-8">
-            <div v-if="!loading">
-
+            <div v-if="!loading && data.data.uuid">
                 <div
                     class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm  dark:bg-gray-800 dark:border-gray-700 ">
                     <!-- task title and description -->
@@ -307,9 +329,10 @@ watch(editMode, (value) => {
                             </span>
                         </div>
 
-                        <div>
+                        <div class="flex gap-2">
                             <Pen class="h-5 w-5 cursor-pointer" v-if="!editMode" @click="editMode = !editMode" />
                             <CircleX class="h-5 w-5 cursor-pointer" v-if="editMode" @click="editMode = !editMode" />
+                            <Trash class="h-5 w-5 cursor-pointer" @click="deleteTask(data.data.uuid)" />
                         </div>
                     </div>
                 </div>
