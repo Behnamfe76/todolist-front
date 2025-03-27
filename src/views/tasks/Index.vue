@@ -54,7 +54,22 @@ const pushRouter = () => {
     router.push(`/tasks?page=${route.query.page ?? 1}&query=${taskSearch.value}&status=${selectOptions.status.value}&completed=${selectOptions.completed.value}`);
 }
 onBeforeMount(async () => {
-    await initTaskList();
+
+    selectOptions.status = taskStatuses[0];
+    selectOptions.completed = taskIsCompleted[0];
+    taskStatuses.forEach((element: { label: string, value: string }) => {
+        if (route.query?.status === element.value) {
+            selectOptions.status = element;
+        }
+    });
+    taskIsCompleted.forEach((element: { label: string, value: string }) => {
+        if (route.query?.completed === element.value) {
+            selectOptions.completed = element;
+        }
+    });
+    taskSearch.value = route.query.query
+
+    await initTaskList(taskSearch.value, selectOptions.status.value, selectOptions.completed.value);
 });
 
 watch(route, async () => {
