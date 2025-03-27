@@ -19,7 +19,7 @@ interface ApiConfig extends AxiosRequestConfig {
 
 // Create Axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: 'http://localhost:8000/api/v1',
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
