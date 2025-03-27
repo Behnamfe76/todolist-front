@@ -120,7 +120,12 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
                                         </div>
                                     </th>
                                     <th v-for="item in tableHead" :key="item" scope="col"
-                                        class="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900">
+                                        class="min-w-[5rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                                        :class="[
+                                            item.name === 'progress' && 'min-w-[10rem]',
+                                        ]"
+
+                                        >
                                         {{ item.label }}
                                     </th>
 
@@ -183,7 +188,13 @@ const indeterminate = computed(() => selectedTask.value.length > 0 && selectedTa
 
                                                 <!-- giving a badge style to statuses -->
                                                 <div v-else
-                                                    :class="thead.name == 'status' ? statuses[item.status.name] + ' px-2 py-[1px] rounded ' : ''">
+                                                    :class="[
+                                                        thead.name == 'status' ? statuses[item.status.name] + ' px-2 py-[1px] rounded ' : '',
+                                                        thead.name == 'description' ? ' w-[10rem] truncate ' : '',
+                                                        thead.name == 'title' ? ' w-[15rem] truncate ' : '',
+                                                    ]"
+
+                                                    >
                                                     {{ item[thead.name]?.label ?? item[thead.name] }}
                                                 </div>
 
