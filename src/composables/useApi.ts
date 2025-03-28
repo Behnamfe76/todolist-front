@@ -32,6 +32,7 @@ export function useApi<T = any>() {
     const error: Ref<string | null> = ref(null)
     const data: Ref<T | null> = ref(null)
     const success: Ref<boolean> = ref(false)
+    const statusCode: Ref<number | null> = ref(null)
     const router: Router = useRouter()
 
     // Generic request handler
@@ -62,7 +63,6 @@ export function useApi<T = any>() {
             })
             data.value = response.data
             success.value = true
-
             if (config.redirectTo) {
                 router.push(config.redirectTo)
             }
@@ -70,6 +70,7 @@ export function useApi<T = any>() {
             return { data: response.data as T, error: null, loading: false }
         } catch (err: any) {
             success.value = false
+            statusCode.value = err.response.status
             error.value = err.response?.data || 'An error occurred'
             return { data: null, error: error.value, loading: false }
         } finally {
@@ -89,6 +90,7 @@ export function useApi<T = any>() {
         request('delete', url, undefined, config)
 
     return {
+        statusCode, // Reactive status code state
         success, // Reactive success state
         data, // Reactive response data
         error, // Reactive error message
