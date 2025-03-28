@@ -14,6 +14,8 @@ import { Icon } from '@iconify/vue'
 import { CircleCheck, CircleX, Pen, LoaderCircle, Trash } from "lucide-vue-next"
 import { useRoute, useRouter } from 'vue-router';
 import moment from 'moment';
+import Image404 from "@/assets/images/404.jpg";
+import Image403 from "@/assets/images/403.jpg";
 import { statusClassAttributes, priorityClassAttributes } from '@/helpers/helper';
 import {
     DropdownMenuContent,
@@ -28,7 +30,7 @@ import * as yup from 'yup';
 
 const Swal = inject('$swal');
 const editMode = ref(false)
-const { getRequest, patchRequest, deleteRequest, loading, error: apiErrors, data } = useApi();
+const { getRequest, patchRequest, deleteRequest, loading, error: apiErrors, data, statusCode } = useApi();
 const route = useRoute();
 const router = useRouter();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -162,7 +164,7 @@ watch(editMode, (value) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl py-4 px-8">
-            <div v-if="!loading && data.data.uuid">
+            <div v-if="!loading && data && data.data.uuid">
                 <div
                     class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm  dark:bg-gray-800 dark:border-gray-700 ">
                     <!-- task title and description -->
@@ -342,7 +344,20 @@ watch(editMode, (value) => {
                     <sub-tasks :uuid="data.data.uuid" />
                 </div>
             </div>
-            <div v-else>loading...</div>
+            <div v-else-if="loading">loading...</div>
+
+            <div v-if="statusCode === 404 && !loading" class="flex justify-center">
+                <div class="flex flex-col items-center">
+                    <img class="w-[50%]" :src="Image404" alt="not found" />
+                    <p class="text-3xl font-bold">Record Not Found</p>
+                </div>
+            </div>
+            <div v-if="statusCode === 403 && !loading" class="flex justify-center">
+                <div class="flex flex-col items-center">
+                    <img class="w-[40%]" :src="Image403" alt="not found" />
+                    <p class="text-3xl font-bold">Access Forbidden</p>
+                </div>
+            </div>
         </div>
     </AppLayout>
 </template>
